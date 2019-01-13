@@ -1,0 +1,29 @@
+{
+  "name": "kernelman/services",
+  "description": "Services library package for php language.",
+  "type": "library",
+  "version": "1.0.0",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Kernel Huang",
+      "role": "Developer"
+    }
+  ],
+  "require": {
+    "php": ">=7.0.0",
+    "kernelman/common" : ">=1.0.0",
+    "kernelman/exceptions" : ">=1.0.0",
+    "kernelman/message" : ">=1.0.0",
+    "swoft/swoole-ide-helper": "dev-master"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^7.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Services\\": "src/"
+    }
+  },
+  "minimum-stability": "dev"
+}
