@@ -15,6 +15,7 @@
     "kernelman/common" : ">=1.0.0",
     "kernelman/exceptions" : ">=1.0.0",
     "kernelman/message" : ">=1.0.0",
+    "kernelman/store" : ">=1.0.0",
     "swoft/swoole-ide-helper": "dev-master"
   },
   "require-dev": {
