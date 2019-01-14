@@ -21,7 +21,7 @@ class MemoryTableTest extends \PHPUnit\Framework\TestCase
      * @throws \Exceptions\RequiredException
      */
     public function testCreateMemoryTable() {
-        $option = require_once dirname(dirname(__FILE__)) . '/src/config/memory.php';
+        $option = require_once dirname(dirname(__FILE__)) . '/config/memory.php';
 
         $memory = new MemoryTable($option->table);
         $memory->column('id')->type('int')->columnSize(4);      // 整数形size: 1, 2, 4, 8, 设置为4字节
