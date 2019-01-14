@@ -58,32 +58,59 @@ class MemoryTable
         $this->table->column($this->name, $this->type, $size);
     }
 
+    /**
+     * @return mixed
+     */
     public function add() {
         return $this->table->create();
     }
 
+    /**
+     * @param $key
+     * @param array $value
+     * @return mixed
+     */
     public function set($key, array $value) {
         return $this->table->set($key, $value);
     }
 
+    /**
+     * @param $key
+     * @return mixed
+     */
     public function get($key) {
         return $this->table->get($key);
     }
 
+    /**
+     * @return mixed
+     */
     public function count() {
         return $this->table->count();
     }
 
+    /**
+     * @param $type
+     * @return $this
+     */
     public function type($type) {
         $this->type = Property::nonExistsReturnNull((object)$this->types, $type);
         return $this;
     }
 
+    /**
+     * @param $name
+     * @return $this
+     */
     public function column($name) {
         $this->name = $name;
         return $this;
     }
 
+    /**
+     * @param $value
+     * @return $this
+     */
     public function addAtomic($value) {
         $this->atomic = new \swoole_atomic($value);
         return $this;
