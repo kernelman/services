@@ -74,6 +74,7 @@ class WebSocket
         self::$server = self::Service();
         self::listen($option);
         self::set($option);
+        self::beforeStart();
         self::$server->start();
     }
 
@@ -143,5 +144,8 @@ class WebSocket
         if (self::$handshake) {
             self::$server->on('handshake', [WebSocket::class, 'onWSHandShake']);
         }
+    }
+
+    private static function beforeStart() {
     }
 }
