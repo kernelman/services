@@ -23,11 +23,13 @@ use Exceptions\UnconnectedException;
  */
 class WebSocket
 {
+    public static $event        = null;
+    public static $memory       = null;
+
     private static $host        = null;
     private static $port        = null;
     private static $server      = null;
     private static $handshake   = null;
-    public static $event        = null;
 
     /**
      * Initialize
@@ -67,6 +69,7 @@ class WebSocket
      * @throws InvalidArgumentException
      * @throws NotFoundException
      * @throws UnconnectedException
+     * @throws \Exceptions\RequiredException
      */
     public static function start($option) {
 
@@ -131,7 +134,7 @@ class WebSocket
         }
 
         foreach ($option->listen as $key => $value) {
-            $methodList = [WebSocket::$event, $value];
+            $methodList = [ WebSocket::$event, $value ];
 
             if (is_callable($methodList)) {
                 self::$server->on($key, $methodList);
@@ -146,6 +149,24 @@ class WebSocket
         }
     }
 
-    private static function beforeStart() {
+    /**
+     * Before starting the WebSocket service to create memory table.
+     *
+     * @throws NotFoundException
+     * @throws \Exceptions\RequiredException
+     */
+    public static function beforeStart() {
+
+        $option = Config::memory();
+        $table  = $option::get('table');
+        $schema = $option::get('schema');
+
+        self::$memory = new MemoryTable($table);
+
+        foreach ($schema as $value) {
+            self::$memory->column($value->name)->type($value->type)->size($value->size);
+        }
+
+        self::$memory->add();
     }
 }

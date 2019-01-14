@@ -1,6 +1,6 @@
 <?php
 /**
- * Class MemoryPool
+ * Class MemoryTable
  *
  * Author:  Kernel Huang
  * Mail:    kernelman79@gmail.com
@@ -15,6 +15,10 @@ use Common\Property;
 use Exceptions\NotFoundException;
 use Exceptions\RequiredException;
 
+/**
+ * Class MemoryTable
+ * @package Services
+ */
 class MemoryTable
 {
     public $table   = null;
@@ -30,6 +34,7 @@ class MemoryTable
 
     /**
      * MemoryTable constructor.
+     *
      * @param null $option, $option->size Defined the max size by table
      * @throws NotFoundException
      */
@@ -47,10 +52,12 @@ class MemoryTable
     }
 
     /**
+     * Set column size.
+     *
      * @param null $size
      * @throws RequiredException
      */
-    public function columnSize($size = null) {
+    public function size($size = null) {
         if ($this->type == null) {
            throw new RequiredException('$this->type.');
         }
@@ -59,6 +66,8 @@ class MemoryTable
     }
 
     /**
+     * Create memory table
+     *
      * @return mixed
      */
     public function add() {
@@ -66,6 +75,8 @@ class MemoryTable
     }
 
     /**
+     * Set key and value to memory table
+     *
      * @param $key
      * @param array $value
      * @return mixed
@@ -75,6 +86,8 @@ class MemoryTable
     }
 
     /**
+     * Get memory table data
+     *
      * @param $key
      * @return mixed
      */
@@ -83,6 +96,8 @@ class MemoryTable
     }
 
     /**
+     * Number of rows for memory table
+     *
      * @return mixed
      */
     public function count() {
@@ -90,6 +105,8 @@ class MemoryTable
     }
 
     /**
+     * Set type of field for memory table
+     *
      * @param $type
      * @return $this
      */
@@ -99,6 +116,8 @@ class MemoryTable
     }
 
     /**
+     * Set the column name
+     *
      * @param $name
      * @return $this
      */
@@ -108,6 +127,8 @@ class MemoryTable
     }
 
     /**
+     * Add atomic
+     *
      * @param $value
      * @return $this
      */

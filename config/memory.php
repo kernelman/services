@@ -8,8 +8,21 @@
  */
 
 return (object)[
-    'table' => (object)[
+    'table'     => (object)[
 
-        'size'    => 4096,  // 单位:字节, 设置共享内存表最大行数, 可以在业务代码中自定义大小
+        'size'  => 4096,  // 单位:字节, 设置共享内存表最大行数, 可以在业务代码中自定义大小
     ],
+
+    'schema'    => (object)[
+        'fd'    => (object)[
+            'name' => 'fd',
+            'type' => 'int',
+            'size' => 4,
+        ],
+        'uid'    => (object)[
+            'name' => 'uid',
+            'type' => 'string',
+            'size' => 64,
+        ],
+    ]
 ];
