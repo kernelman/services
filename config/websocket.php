@@ -31,18 +31,18 @@ return (object)[
 
     // 监听方法
     'listen' => (object)[
-        'Start'         => 'onStart',
-        'WorkerStart'   => 'onWorkerStart',
-        'Task'          => 'onTask',
-        'Finish'        => 'onFinish',
-        'PipeMessage'   => 'onPipeMessage',
-        'WorkerError'   => 'onWorkerError',
-        'ManagerStart'  => 'onManagerStart',
-        'ManagerStop'   => 'onManagerStop',
+        'start'         => 'onStart',
+        'workerStart'   => 'onWorkerStart',
+        'task'          => 'onTask',
+        'finish'        => 'onFinish',
+        'pipeMessage'   => 'onPipeMessage',
+        'workerError'   => 'onWorkerError',
+        'managerStart'  => 'onManagerStart',
+        'managerStop'   => 'onManagerStop',
         'request'       => 'onRequest',
         'open'          => 'onWSOpen',
         'message'       => 'onWSMessage',
         'close'         => 'onWSClose',
-        'Shutdown'      => 'onShutdown',
+        'shutdown'      => 'onShutdown',
     ]
 ];
