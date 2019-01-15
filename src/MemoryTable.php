@@ -23,9 +23,9 @@ class MemoryTable
 {
     public $table   = null;
     private $atomic = null;
-    private $size   = 2048;
     private $name   = null;
     private $type   = null;
+    private $size   = 2048;
     private $types  = [
         'int'       => \swoole_table::TYPE_INT,
         'float'     => \swoole_table::TYPE_FLOAT,

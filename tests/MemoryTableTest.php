@@ -17,9 +17,12 @@ use Services\Config;
 class MemoryTableTest extends \PHPUnit\Framework\TestCase
 {
 
+    const KEY   = 'kernel';
+    const TABLE = 'table';
+
     public function testMemoryTableConfig() {
-        $option = Config::memory()::get('table');
-        $size   = Config::memory()::find('table')::next('size');
+        $option = Config::memory()::get(self::TABLE);
+        $size   = Config::memory()::find(self::TABLE)::next('size');
         $this->assertEquals($size, $option->size);
 
         $config = Config::memory()::find('schema')::next('id')::next('name');
@@ -31,7 +34,7 @@ class MemoryTableTest extends \PHPUnit\Framework\TestCase
      * @throws \Exceptions\RequiredException
      */
     public function testCreateMemoryTable() {
-        $option = Config::memory()::get('table');
+        $option = Config::memory()::get(self::TABLE);
         $memory = new MemoryTable($option);
 
         $memory->column('id')->type('int')->size(4);      // 整数形size: 1, 2, 4, 8, 设置为4字节
@@ -41,16 +44,16 @@ class MemoryTableTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($add);
 
         $value  = [ 'id' => 1, 'uid' => 'uid' ];
-        $set    = $memory->table->set('kernel', $value);
+        $set    = $memory->table->set(self::KEY, $value);
         $this->assertTrue($set);
 
-        $data = $memory->table->get('kernel');
+        $data = $memory->table->get(self::KEY);
         $this->assertEquals($data, $value);
 
         $count = $memory->table->count();
         $this->assertEquals($count, 1);
 
-        $memory->table->del('kernel');
+        $memory->table->del(self::KEY);
         $memory->table->destroy();
     }
 }

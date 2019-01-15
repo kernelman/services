@@ -16,6 +16,8 @@ use Services\WebSocket;
 class WebSocketTest extends \PHPUnit\Framework\TestCase
 {
 
+    const KEY   = 'kernel';
+
     /**
      * @throws \Exceptions\NotFoundException
      * @throws \Exceptions\RequiredException
@@ -24,12 +26,12 @@ class WebSocketTest extends \PHPUnit\Framework\TestCase
         WebSocket::beforeStart();
 
         $value  = [ 'fd' => 1, 'uid' => 'pid' ];
-        $set    = WebSocket::$memory->table->set('kernel', $value);
+        $set    = WebSocket::$memory->table->set(self::KEY, $value);
 
         $this->assertTrue($set);
 
-        $data = WebSocket::$memory->get('kernel');
-        WebSocket::$memory->table->del('kernel');
+        $data = WebSocket::$memory->get(self::KEY);
+        WebSocket::$memory->table->del(self::KEY);
         WebSocket::$memory->table->destroy();
 
         $this->assertEquals($data, $value);

@@ -28,7 +28,7 @@ class WebSocket
 
     private static $host        = null;
     private static $port        = null;
-    private static $server      = null;
+    private static $service      = null;
     private static $handshake   = null;
 
     /**
@@ -51,19 +51,19 @@ class WebSocket
 
         self::$host     = Property::nonExistsReturnNull($option->set, 'host');
         if (self::$host == null) {
-            throw new InvalidArgumentException("The WebSocket server host settings not found");
+            throw new InvalidArgumentException("The WebSocket service host settings not found");
         }
 
         self::$port     = Property::nonExistsReturnZero($option->set, 'port');
         if (self::$port == 0) {
-            throw new InvalidArgumentException("The WebSocket server host settings not found");
+            throw new InvalidArgumentException("The WebSocket service host settings not found");
         }
 
         self::$handshake = Property::nonExistsReturnNull($option->set, 'handshake');
     }
 
     /**
-     * Start WebSocket server
+     * Start WebSocket service
      *
      * @param $option
      * @throws InvalidArgumentException
@@ -74,26 +74,26 @@ class WebSocket
     public static function start($option) {
 
         self::initialize($option);
-        self::$server = self::Service();
+        self::$service = self::server();
         self::listen($option);
         self::set($option);
         self::beforeStart();
-        self::$server->start();
+        self::$service->start();
     }
 
     /**
-     * Open service for WebSocket server
+     * Open server for WebSocket service
      *
      * @return \Swoole\WebSocket\Server
      * @throws UnconnectedException
      */
-    private static function Service() {
-        $server = new \Swoole\WebSocket\Server(self::$host, self::$port);
-        if ($server) {
-            return $server;
+    private static function server() {
+        $service = new \Swoole\WebSocket\Server(self::$host, self::$port);
+        if ($service) {
+            return $service;
         }
 
-        throw new UnconnectedException('WebSocket Server: ' . self::$host . ':'. self::$port );
+        throw new UnconnectedException('WebSocket Server start failed: ' . self::$host . ':'. self::$port );
     }
 
     /**
@@ -104,7 +104,7 @@ class WebSocket
     private static function set($option) {
         $set = $option->set;
 
-        self::$server->set(array(
+        self::$service->set(array(
             'worker_num'                => $set->workers,
             'daemonize'                 => $set->daemon,
             'open_eof_split'            => $set->eofSplit,
@@ -137,7 +137,7 @@ class WebSocket
             $methodList = [ WebSocket::$event, $value ];
 
             if (is_callable($methodList)) {
-                self::$server->on($key, $methodList);
+                self::$service->on($key, $methodList);
 
             } else {
                 throw new NotFoundException('Cannot call method: ' . $value . ' on class.');
@@ -145,7 +145,7 @@ class WebSocket
         }
 
         if (self::$handshake) {
-            self::$server->on('handshake', [WebSocket::class, 'onWSHandShake']);
+            self::$service->on('handshake', [WebSocket::class, 'onWSHandShake']);
         }
     }
 
