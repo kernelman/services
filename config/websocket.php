@@ -15,7 +15,7 @@ return (object)[
         'handshake'                 => false,               // 自定义WebSocket握手协议
         'workers'                   => 6,                   // 开启进程数量
         'daemon'                    => false,               // 是否开启守护进程
-        'sockType'                  => SWOOLE_SOCK_TCP,     // sock连接类型
+        'socketType'                => SWOOLE_SOCK_TCP,     // sock连接类型
         'syncType'                  => SWOOLE_SOCK_ASYNC,   // SWOOLE_SOCK_SYNC/SWOOLE_SOCK_ASYNC, 同步/异步，默认异步
         'timeout'                   => 0.1,                 // 超时值默认为0.1s，即100毫秒
         'flag'                      => 0,                   // UDP连接类型专用标志，1启用udp_connect，0不启用
