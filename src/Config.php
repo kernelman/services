@@ -42,11 +42,10 @@ class Config {
 
         try {
 
-            $path = dirname(__DIR__) . '/config/' . self::$configName . '.php';
-
+            $path = self::getDefinedPath();
             if (FileStore::checkFile($path)) {
-                self::$config = include $path;
 
+                self::$config = include $path;
                 if (!is_object(self::$config)) {
                     throw new InvalidArgumentException(self::$configName . ' value must be the object');
                 }
@@ -164,5 +163,19 @@ class Config {
         }
 
         throw new NotFoundException($property . self::PROPERTY_AT . self::$configName . self::CONFIG);
+    }
+
+    /**
+     * Get the configuration path is defined
+     *
+     * @return string
+     */
+    private static function getDefinedPath() {
+
+        if (defined('CONFIG_PATH')) {
+            return CONFIG_PATH . self::$configName . '.php';
+        }
+
+        return dirname(__DIR__) . '/config/' . self::$configName . '.php';
     }
 }
