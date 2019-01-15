@@ -42,7 +42,7 @@ class Config {
 
         try {
 
-            $path = dirname(dirname(__FILE__)) . '/config/' . self::$configName . '.php';
+            $path = dirname(__DIR__) . '/config/' . self::$configName . '.php';
 
             if (FileStore::checkFile($path)) {
                 self::$config = include $path;
