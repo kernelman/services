@@ -28,7 +28,7 @@ class WebSocket
 
     private static $host        = null;
     private static $port        = null;
-    private static $service      = null;
+    private static $service     = null;
     private static $handshake   = null;
 
     /**
