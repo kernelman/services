@@ -1,6 +1,6 @@
 <?php
 /**
- * Class CoRoutinePool
+ * Class CoMysqlPool
  *
  * Author:  Kernel Huang
  * Mail:    kernelman79@gmail.com
@@ -11,9 +11,10 @@
 namespace Services;
 
 
+use Exceptions\NotFoundException;
 use Exceptions\UnconnectedException;
 
-class CoRoutinePool
+class CoMysqlPool
 {
 
     private $pool;                  // Connect pool
@@ -23,9 +24,14 @@ class CoRoutinePool
      * Initialize
      *
      * @param $config
+     * @throws NotFoundException
      * @throws UnconnectedException
      */
     private function initialize($config) {
+        if (!extension_loaded('swoole')) {
+            throw new NotFoundException('The swoole extension can not loaded.');
+        }
+
         $this->pool = new \chan($config['maxSize']);  // Create container pool for channel.
 
         for ($i = 0; $i < $config['maxSize']; $i++) {
@@ -44,13 +50,14 @@ class CoRoutinePool
      * Get pool instance
      *
      * @param $config
-     * @return null|CoRoutinePool
+     * @return null|CoMysqlPool
+     * @throws NotFoundException
      * @throws UnconnectedException
      */
     public static function getInstance($config) {
         if (self::$instance === null) {
 
-            $pool = new CoRoutinePool();
+            $pool = new CoMysqlPool();
             $pool->initialize($config);
             self::$instance = $pool;
         }
