@@ -143,7 +143,7 @@ class CoRedisPoole
         self::$persistent   = env('REDIS_PERSISTENT', self::$persistent);
 
         self::$prefix       = env('REDIS_PREFIX', self::$prefix);
-        self::$maxSize      = (int)env('MAX_SIZE', 0);
+        self::$maxSize      = (int)env('REDIS_MAXSIZE', 0);
     }
 
     /**
@@ -185,7 +185,7 @@ class CoRedisPoole
         self::$persistent   = Property::isExists(self::$config, 'REDIS_PERSISTENT', self::$persistent);
 
         self::$prefix       = Property::nonExistsReturnNull(self::$config, 'REDIS_PREFIX');
-        self::$maxSize      = (int)Property::nonExistsReturnZero(self::$config, 'MAX_SIZE');
+        self::$maxSize      = (int)Property::nonExistsReturnZero(self::$config, 'REDIS_MAXSIZE');
     }
 
     /**
