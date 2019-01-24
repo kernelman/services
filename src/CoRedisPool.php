@@ -63,6 +63,7 @@ class CoRedisPoole
         $this->pool = new \chan(self::$maxSize);  // Create container pool for channel.
 
         for ($i = 0; $i < self::$maxSize; $i++) {
+
             $redis = new \Swoole\Coroutine\Redis();
             $redis->connect(self::$host, self::$port);
 
@@ -142,6 +143,7 @@ class CoRedisPoole
         self::$persistent   = env('REDIS_PERSISTENT', self::$persistent);
 
         self::$prefix       = env('REDIS_PREFIX', self::$prefix);
+        self::$maxSize      = (int)env('MAX_SIZE', 0);
     }
 
     /**
@@ -183,6 +185,7 @@ class CoRedisPoole
         self::$persistent   = Property::isExists(self::$config, 'REDIS_PERSISTENT', self::$persistent);
 
         self::$prefix       = Property::nonExistsReturnNull(self::$config, 'REDIS_PREFIX');
+        self::$maxSize      = (int)Property::nonExistsReturnZero(self::$config, 'MAX_SIZE');
     }
 
     /**
