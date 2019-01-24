@@ -18,7 +18,7 @@ use Exceptions\NotFoundException;
 use Exceptions\UnconnectedException;
 use Exceptions\UnSelectedException;
 
-class CoRedisPoole
+class CoRedisPool
 {
 
     private $pool;                      // Connect pool
