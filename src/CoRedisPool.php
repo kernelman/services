@@ -206,7 +206,7 @@ class CoRedisPool
     /**
      * Get pool instance
      *
-     * @return null|CoRedisPoole
+     * @return null|CoRedisPool
      * @throws AuthorizationException
      * @throws InvalidArgumentException
      * @throws NotFoundException
@@ -216,7 +216,7 @@ class CoRedisPool
     public static function getInstance() {
         if (self::$instance === null) {
 
-            $pool = new CoRedisPoole();
+            $pool = new CoRedisPool();
             $pool->initialize();
             self::$instance = $pool;
         }
