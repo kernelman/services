@@ -34,6 +34,8 @@ class CoRedisPoole
     public  static $prefix      = null; // Key默认前缀名
     public  static $config      = null; // 不为空使用自定义配置文件对象, 为空则使用第三方框架配置: Laravel
     public  static $instance    = null; // Instance
+    const  NAME                 = 'Name: ';
+    const  VALUE                = 'Value: ';
 
     /**
      * Initialize
@@ -45,20 +47,8 @@ class CoRedisPoole
      * @throws UnconnectedException
      */
     private function initialize() {
-        if (!extension_loaded('swoole')) {
-            throw new NotFoundException('The swoole extension can not loaded.');
-        }
-
-        if (!extension_loaded('redis')) {
-            throw new NotFoundException('The Redis extension can not loaded.');
-        }
-
-        if (self::$config != null) {
-            self::useConfig();
-
-        } else {
-            self::useApiConfig();
-        }
+        self::checkExtension();
+        self::setConfig();
 
         $this->pool = new \chan(self::$maxSize);  // Create container pool for channel.
 
@@ -74,19 +64,19 @@ class CoRedisPoole
             // 设置Key前缀
             $success = $redis->setOption(\Redis::OPT_PREFIX, self::$prefix);
             if (!$success) {
-                throw new InvalidArgumentException('Name: ' . \Redis::OPT_PREFIX . 'Value: ' . self::$prefix);
+                throw new InvalidArgumentException(self::NAME . 'Redis::OPT_PREFIX' . self::VALUE . self::$prefix);
             }
 
             // 开启缓存数据的序列化及反序列化
             $success = $redis->setOption(\Redis::OPT_SERIALIZER, self::$serializer);
             if (!$success) {
-                throw new InvalidArgumentException('Name: ' . \Redis::OPT_SERIALIZER . 'Value: ' . self::$serializer);
+                throw new InvalidArgumentException(self::NAME . 'Redis::OPT_SERIALIZER' . self::VALUE . self::$serializer);
             }
 
             // 开启Scan多次扫描
             $success = $redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_RETRY);
             if (!$success) {
-                throw new InvalidArgumentException('Name: ' . \Redis::OPT_SERIALIZER . 'Value: ' . self::$serializer);
+                throw new InvalidArgumentException(self::NAME . 'Redis::SCAN_RETRY' . self::VALUE . self::$serializer);
             }
 
             // 验证密码
@@ -102,6 +92,31 @@ class CoRedisPoole
             }
 
             $this->recycle($redis);
+        }
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    private static function checkExtension() {
+        if (!extension_loaded('swoole')) {
+            throw new NotFoundException('The swoole extension can not loaded.');
+        }
+
+        if (!extension_loaded('redis')) {
+            throw new NotFoundException('The Redis extension can not loaded.');
+        }
+    }
+
+    /**
+     * @throws InvalidArgumentException
+     */
+    private static function setConfig() {
+        if (self::$config != null) {
+            self::useConfig();
+
+        } else {
+            self::useApiConfig();
         }
     }
 
