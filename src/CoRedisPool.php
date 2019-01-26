@@ -62,19 +62,19 @@ class CoRedisPool
             }
 
             // 设置Key前缀
-            $success = $redis->setOption(\Redis::OPT_PREFIX, self::$prefix);
+            $success = $redis->setOptions([ \Redis::OPT_PREFIX, self::$prefix ]);
             if (!$success) {
                 throw new InvalidArgumentException(self::NAME . 'Redis::OPT_PREFIX' . self::VALUE . self::$prefix);
             }
 
             // 开启缓存数据的序列化及反序列化
-            $success = $redis->setOption(\Redis::OPT_SERIALIZER, self::$serializer);
+            $success = $redis->setOptions([ \Redis::OPT_SERIALIZER, self::$serializer ]);
             if (!$success) {
                 throw new InvalidArgumentException(self::NAME . 'Redis::OPT_SERIALIZER' . self::VALUE . self::$serializer);
             }
 
             // 开启Scan多次扫描
-            $success = $redis->setOption(\Redis::OPT_SCAN, \Redis::SCAN_RETRY);
+            $success = $redis->setOptions([ \Redis::OPT_SCAN, \Redis::SCAN_RETRY ]);
             if (!$success) {
                 throw new InvalidArgumentException(self::NAME . 'Redis::SCAN_RETRY' . self::VALUE . self::$serializer);
             }
