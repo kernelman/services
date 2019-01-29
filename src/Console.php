@@ -16,15 +16,17 @@ use Exceptions\NotFoundException;
 class Console
 {
 
-    private $config         = '';
+    private $config         = null;
     private $tasksDir       = '';
     private $documentation  = [];
 
     /**
      * @param array|null $arguments
+     * @param $cfg object
      * @throws NotFoundException
      */
-    public function handle(array $arguments = null) {
+    public function handle(array $arguments = null, $cfg = null) {
+        $this->config = $cfg;
         if (isset($arguments['task']) && in_array($arguments['task'], ['-h', '--help', 'help'])) {
             $this->setTasksDir();
             $this->createHelp();
@@ -45,11 +47,11 @@ class Console
     private function setTasksDir() {
         $config = $this->config;
 
-        if (!isset($config['tasksDir']) || !is_dir($config['tasksDir'])) {
+        if (!isset($config->tasksDir) || !is_dir($config->tasksDir)) {
             throw new NotFoundException("Invalid provided tasks Dir");
         }
 
-        $this->tasksDir = $config['tasksDir'];
+        $this->tasksDir = $config->tasksDir;
     }
 
     private function createHelp() {
@@ -130,12 +132,12 @@ class Console
     private function showHelp() {
         $config = $this->config;
         $helpOutput = PHP_EOL;
-        if (isset($config['appName'])) {
-            $helpOutput .= $config['appName'] . ' ';
+        if (isset($config->appName)) {
+            $helpOutput .= $config->appName . ' ';
         }
 
-        if (isset($config['version'])) {
-            $helpOutput .= $config['version'];
+        if (isset($config->version)) {
+            $helpOutput .= $config->version;
         }
 
         echo $helpOutput . PHP_EOL;
@@ -164,12 +166,12 @@ class Console
     private function showTaskHelp($taskTogetHelp) {
         $config = $this->config;
         $helpOutput = PHP_EOL;
-        if (isset($config['appName'])) {
-            $helpOutput .= $config['appName'] . ' ';
+        if (isset($config->appName)) {
+            $helpOutput .= $config->appName . ' ';
         }
 
-        if (isset($config['version'])) {
-            $helpOutput .= $config['version'];
+        if (isset($config->version)) {
+            $helpOutput .= $config->version;
         }
 
         echo $helpOutput . PHP_EOL;
