@@ -24,7 +24,7 @@ class CommandLineApp
     public $cli     = null;
     public $task    = null;
     public $action  = null;
-    public $params  = null;
+    public $params  = [];
 
     /**
      * CommandLineApp constructor.
@@ -92,7 +92,7 @@ class CommandLineApp
      */
     public function getParam($key, $arg) {
         if ($key >= 3) {
-            $this->params = $arg;
+            array_push($this->params, $arg);
         }
     }
 }
