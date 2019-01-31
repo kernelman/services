@@ -29,13 +29,13 @@ class Console
         $this->config = $cfg;
         if (isset($arguments['task']) && in_array($arguments['task'], ['-h', '--help', 'help'])) {
             $this->setTasksDir();
-            $this->createHelp();
+            $this->createHelp($arguments);
             $this->showHelp();
             return;
 
         } elseif (isset($arguments['action']) && in_array($arguments['action'], ['-h', '--help', 'help'])) {
             $this->setTasksDir();
-            $this->createHelp();
+            $this->createHelp($arguments);
             $this->showTaskHelp($arguments['task']);
             return;
         }
@@ -54,74 +54,33 @@ class Console
         $this->tasksDir = $config->tasksDir;
     }
 
-    private function createHelp() {
-        $scannedTasksDir = array_diff(scandir($this->tasksDir), ['..', '.']);
-
+    private function createHelp($arguments) {
         $config = $this->config;
-        $dispatcher = $this->config->dispatcher;
-        $namespace = $dispatcher->getNamespaceName();
-
-        if (isset($config['annotationsAdapter']) && $config['annotationsAdapter']) {
-            $adapter = '\Phalcon\Annotations\Adapter\\' . $config['annotationsAdapter'];
-            if (class_exists($adapter)) {
-                $reader = new $adapter();
-            } else {
-                $reader = new ConsoleAdapter();
-            }
-        } else {
-            $reader = new ConsoleAdapter();
-        }
+        $namespace = $config->namespace;
+        $scannedTasksDir = array_diff(scandir($this->tasksDir), ['..', '.', $config->cliName]);
 
         foreach ($scannedTasksDir as $taskFile) {
             $taskFileInfo = pathinfo($taskFile);
             $taskClass = ($namespace ? $namespace . '\\' : '') . $taskFileInfo["filename"];
-            $taskName  = strtolower(str_replace('Task', '', $taskFileInfo["filename"]));
+            $taskName  = strtolower($taskFileInfo["filename"]);
+            $this->documentation[$taskName] = [];
+            $reflector = new \ReflectionClass($taskClass);
+            $annotations = $reflector->getMethods(\ReflectionMethod::IS_PUBLIC);
 
-            $this->documentation[$taskName] = ['description' => [''], 'actions' => []];
-
-            $reflector = $reader->get($taskClass);
-
-            $annotations = $reflector->getClassAnnotations();
-
-            if (!$annotations) {
-                continue;
-            }
-
+            $description = $reflector->getProperty('description');
             // Class Annotations
             foreach ($annotations as $annotation) {
-                if ($annotation->getName() == 'description') {
-                    $this->documentation[$taskName]['description'] = $annotation->getArguments();
-                }
-            }
 
-            $methodAnnotations = $reflector->getMethodsAnnotations();
+                $params     = $annotation->getParameters();
+                $actionName = $annotation->getName();
 
-            // Method Annotations
-            if (!$methodAnnotations) {
-                continue;
-            }
-
-            foreach ($methodAnnotations as $action => $collection) {
-                if ($collection->has('DoNotCover')) {
-                    continue;
+                foreach ($params as $param) {
+                    $getParams[] = $param->getName();
                 }
 
-                $actionName = strtolower(str_replace('Action', '', $action));
-
-                $this->documentation[$taskName]['actions'][$actionName] = [];
-
-                $actionAnnotations = $collection->getAnnotations();
-
-                foreach ($actionAnnotations as $actAnnotation) {
-                    $_anotation = $actAnnotation->getName();
-                    if ($_anotation == 'description') {
-                        $getDesc = $actAnnotation->getArguments();
-                        $this->documentation[$taskName]['actions'][$actionName]['description'] = $getDesc;
-                    } elseif ($_anotation == 'param') {
-                        $getParams = $actAnnotation->getArguments();
-                        $this->documentation[$taskName]['actions'][$actionName]['params'][]  = $getParams;
-                    }
-                }
+                $this->documentation[$taskName][$actionName]['params'] = $getParams;
+                $this->documentation[$taskName][$actionName]['description'] = (array)$description->getName();
+                $this->documentation[$taskName][$actionName]['actions'] = $annotation->getName();
             }
         }
     }
