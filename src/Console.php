@@ -66,8 +66,9 @@ class Console
             $this->documentation[$taskName] = [];
             $reflector = new \ReflectionClass($taskClass);
             $annotations = $reflector->getMethods(\ReflectionMethod::IS_PUBLIC);
-
             $description = $reflector->getProperty('description');
+            $getParams[] = [];
+
             // Class Annotations
             foreach ($annotations as $annotation) {
 
