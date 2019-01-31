@@ -147,37 +147,42 @@ class Console
             echo  PHP_EOL;
             echo "Task: " . $task . PHP_EOL . PHP_EOL ;
 
-            foreach ($doc['description'] as $line) {
-                echo '  '.$line . PHP_EOL;
+            if (isset($doc['description'])) {
+                foreach ($doc['description'] as $line) {
+                    echo '  '.$line . PHP_EOL;
+                }
             }
+
             echo  PHP_EOL;
             echo 'Available actions:'.PHP_EOL.PHP_EOL;
 
-            foreach ($doc['actions'] as $actionName => $aDoc) {
-                echo '           '.$actionName . PHP_EOL;
-                if (isset($aDoc['description'])) {
-                    echo '               '.implode(PHP_EOL, $aDoc['description']) . PHP_EOL;
-                }
-                echo  PHP_EOL;
-                if (isset($aDoc['params']) && is_array($aDoc['params'])) {
-                    echo '               Parameters:'.PHP_EOL;
-                    foreach ($aDoc['params'] as $param) {
-                        if (is_array($param)) {
-                            $_to_print = '';
-                            if (isset($param[0]['name'])) {
-                                $_to_print = $param[0]['name'];
-                            }
+            if (isset($doc['actions'])) {
+                foreach ($doc['actions'] as $actionName => $aDoc) {
+                    echo '           ' . $actionName . PHP_EOL;
+                    if (isset($aDoc['description'])) {
+                        echo '               ' . implode(PHP_EOL, $aDoc['description']) . PHP_EOL;
+                    }
+                    echo PHP_EOL;
+                    if (isset($aDoc['params']) && is_array($aDoc['params'])) {
+                        echo '               Parameters:' . PHP_EOL;
+                        foreach ($aDoc['params'] as $param) {
+                            if (is_array($param)) {
+                                $_to_print = '';
+                                if (isset($param[0]['name'])) {
+                                    $_to_print = $param[0]['name'];
+                                }
 
-                            if (isset($param[0]['type'])) {
-                                $_to_print .= ' ( '.$param[0]['type'].' )';
-                            }
+                                if (isset($param[0]['type'])) {
+                                    $_to_print .= ' ( ' . $param[0]['type'] . ' )';
+                                }
 
-                            if (isset($param[0]['description'])) {
-                                $_to_print .= ' '.$param[0]['description'].PHP_EOL;
-                            }
+                                if (isset($param[0]['description'])) {
+                                    $_to_print .= ' ' . $param[0]['description'] . PHP_EOL;
+                                }
 
-                            if (!empty($_to_print)) {
-                                echo '                   '.$_to_print;
+                                if (!empty($_to_print)) {
+                                    echo '                   ' . $_to_print;
+                                }
                             }
                         }
                     }
