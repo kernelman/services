@@ -39,6 +39,7 @@ class CommandLineApp
             $this->getCli($key, $arg);
             $this->getTask($key, $arg);
             $this->getAction($key, $arg);
+            $this->getParam($key, $arg);
         }
 
         $this->defined($arguments);
