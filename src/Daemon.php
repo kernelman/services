@@ -11,6 +11,7 @@
 namespace Services;
 
 
+use Common\Strings;
 use Exceptions\InvalidArgumentException;
 use Exceptions\NotFoundException;
 use Store\File\Sync\FileStore;
@@ -21,12 +22,15 @@ class Daemon
     private $pidFile        = '/tmp/pid/';  // Pid file dir path
     private $user           = 'www';
     private $fileName       = null;
-    private $class          = null;         // Now run class
-    private $action         = null;         // Now run action(method)
+    private $class          = null;         // current run class
+    private $className      = null;         // current run class name
+    private $action         = null;         // current run action(method)
     private static $signal  = 0;            // Set current signal
 
     const   IS_DOWN         = 'The process is not running';
     const   IS_RUN          = 'The process is running';
+    const   IS_STOP         = 'The process has stoped';
+    const   IS_START        = 'The process has started';
 
     /**
      * Daemon constructor.
@@ -52,9 +56,10 @@ class Daemon
 
         $this->class    = $class;
         $this->action   = $action;
+        $this->className= Strings::trimStrString(get_class($this->class), '\\');
 
         // The pid file save path.
-        $this->fileName = $this->pidFile . '/' . basename(get_class($class), '.php') . $pidParams . '.pid';
+        $this->fileName = $this->pidFile . $this->className . $pidParams . '.pid';
         // Set exec users, default to www.
         if ($user != null) {
             $this->user = $user;
@@ -114,9 +119,9 @@ class Daemon
     /**
      * Run current class
      */
-    private function run(){
+    private function run() {
 
-        while (true){
+        while (true) {
             $this->class->run();
         }
     }
@@ -200,24 +205,31 @@ class Daemon
         if (file_exists($this->fileName)) {
             $pid = FileStore::get($this->fileName);
             posix_kill($pid, SIGUSR1);
-            return FileStore::deleteFile($this->fileName);
+            $del = FileStore::deleteFile($this->fileName);
+
+            if ($del) {
+                echo $this->className . ': ' . self::IS_STOP . PHP_EOL;
+            }
+
+        } else {
+            echo self::IS_DOWN . PHP_EOL;
         }
 
-        echo self::IS_DOWN . PHP_EOL;
         return false;
     }
 
     /**
      * Start the process
      */
-    private function start(){
+    private function start() {
         if (file_exists($this->fileName)) {
-            echo self::IS_RUN . PHP_EOL;
+            echo $this->className . ': ' . self::IS_RUN . PHP_EOL;
             exit(0);
         }
 
         $this->daemonFork();
         $this->createPidfile();
+        echo $this->className . ': ' . self::IS_START . PHP_EOL;
         $this->run();
     }
 
@@ -250,7 +262,7 @@ class Daemon
      * @throws \Exceptions\UnReadableException
      * @throws \Exceptions\UnWritableException
      */
-    public function main($action){
+    public function call($action){
         switch ($action){
             case 'start':
                 $this->start();
