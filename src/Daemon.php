@@ -122,6 +122,7 @@ class Daemon
     private function run() {
 
         while (true) {
+            sleep(10);
             $this->class->run();
         }
     }
