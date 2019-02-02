@@ -124,8 +124,9 @@ class Console
      * @param $taskTogetHelp
      */
     private function showTaskHelp($taskTogetHelp) {
-        $config = $this->config;
+        $config     = $this->config;
         $helpOutput = PHP_EOL;
+
         if (isset($config->appName)) {
             $helpOutput .= $config->appName . ' ';
         }
