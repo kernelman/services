@@ -23,7 +23,7 @@ class Timer
     private $sec;
 
     public $callClass;
-    public $before      = null;
+    public $after       = null;
     public $asyncTimer  = true;
     public $coRoutine   = true;
 
@@ -37,7 +37,7 @@ class Timer
      * @param int $sec
      * @throws NotFoundException
      */
-    public function __construct($callClass, $callback, $times = 0, $min = 0, $sec = 0) {
+    public function __construct($after, $callClass, $callback, $times = 0, $min = 0, $sec = 0) {
         if (!extension_loaded('swoole')) {
             throw new NotFoundException('The swoole extension can not loaded.');
         }
@@ -45,6 +45,7 @@ class Timer
         $this->min      = $min;
         $this->sec      = $sec;
         $this->times    = $times;
+        $this->after    = $after;
         $this->callback = $callback;
         $this->callClass= $callClass;
     }
@@ -82,7 +83,7 @@ class Timer
         if ($this->times > 0 ) {
 
             if ($this->asyncTimer) {
-                $this->runTick('call', $this->times);
+                $this->trigger(null, 'call', $this->times);
 
             } else {
                 $this->runTick('once', $this->times);
@@ -319,14 +320,15 @@ class Timer
      * @param $callLast
      * @param int $stopwatch
      */
-    private function trigger(string $callFirst, string $callLast = '', $stopwatch = 1) {
+    private function trigger(string $callFirst = null, string $callLast, $stopwatch = 1) {
 
         if ($this->asyncTimer) {
 
-            if ($this->before === null) {
+            if ($this->after === null) {
                 \swoole_timer_tick($stopwatch * 1000, function() use ($callFirst, $callLast) {
-                    if ($callLast == '') {
-                        $this->{$callFirst}();
+
+                    if ($callFirst == null) {
+                        $this->{$callLast}();
 
                     } else {
 
@@ -337,7 +339,7 @@ class Timer
                 });
 
             }  else {
-                $this->triggerBefore($callFirst, $callLast, $stopwatch);
+                $this->triggerAfter($callFirst, $callLast, $stopwatch);
             }
 
         } else {
@@ -345,8 +347,8 @@ class Timer
             while (true) {
                 sleep($stopwatch);
 
-                if ($callLast == '') {
-                    $this->{$callFirst}();
+                if ($callFirst == null) {
+                    $this->{$callLast}();
 
                 } else {
 
@@ -358,6 +360,34 @@ class Timer
         }
     }
 
-    private function triggerBefore(string $callFirst, string $callLast = '', $stopwatch = 1) {
+    /**
+     * @param string|null $callFirst
+     * @param string $callLast
+     * @param int $stopwatch
+     */
+    private function triggerAfter(string $callFirst = null, string $callLast, $stopwatch = 1) {
+        if ($callFirst == null) {
+
+            \swoole_timer_after($this->after * 1000, function() use ($callLast) {
+                $this->{$callLast}();
+            });
+
+            \swoole_timer_tick($stopwatch * 1000, function() use ($callLast) {
+                $this->{$callLast}();
+            });
+
+        } else {
+
+            \swoole_timer_after($this->after * 1000, function() use ($callLast) {
+                $this->{$callLast}();
+            });
+
+            \swoole_timer_tick($stopwatch * 1000, function() use ($callFirst, $callLast) {
+
+                if($this->{$callFirst}()) {
+                    $this->{$callLast}();
+                }
+            });
+        }
     }
 }

@@ -24,11 +24,11 @@ class EventTimer
         }
     }
 
-    public function after(string $callFirst, string $callLast = '', $stopwatch = 1) {
-        if ($callLast == '') {
+    public function after(string $callFirst = null, string $callLast, $stopwatch = 1) {
+        if ($callFirst === null) {
 
-            $event = new \EvTimer($this->after, $stopwatch, function() use ($callFirst) {
-               $callFirst();
+            $event = new \EvTimer($this->after, $stopwatch, function() use ($callLast) {
+               $callLast();
             });
 
             \Ev::run();
@@ -36,8 +36,10 @@ class EventTimer
         } else {
 
             if($callFirst()) {
-                $event = new \EvTimer($this->after, $stopwatch, function() use ($callLast) {
-                    $callLast();
+                $event = new \EvTimer($this->after, $stopwatch, function() use ($callFirst, $callLast) {
+                    if ($callFirst()) {
+                        $callLast();
+                    }
                 });
 
                 \Ev::run();
