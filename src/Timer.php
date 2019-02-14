@@ -24,12 +24,11 @@ class Timer
 
     public $callClass;
     public $asyncTimer = true;
-    public $coroutine  = true;
+    public $coRoutine  = true;
 
     /**
      * Timer constructor.
      *
-     * Timer constructor.
      * @param $callClass
      * @param $callback
      * @param int $times
@@ -63,7 +62,7 @@ class Timer
      */
     public function once() {
 
-        if ($this->coroutine) {
+        if ($this->coRoutine) {
 
             go(function () {
                 $this->call();
@@ -82,10 +81,10 @@ class Timer
         if ($this->times > 0 ) {
 
             if ($this->asyncTimer) {
-                $this->runTick($this->call(), $this->times);
+                $this->runTick('call', $this->times);
 
             } else {
-                $this->runTick($this->once(), $this->times);
+                $this->runTick('once', $this->times);
             }
         }
     }
@@ -119,7 +118,7 @@ class Timer
      *
      */
     public function hourlies() {
-        $this->runTick($this->onHourlies());
+        $this->runTick('onHourlies');
     }
 
     /**
@@ -140,7 +139,7 @@ class Timer
      *
      */
     public function hourlyAny() {
-        $this->runTick($this->onHourlyAny());
+        $this->runTick('onHourlyAny');
     }
 
     /**
@@ -160,7 +159,7 @@ class Timer
      *
      */
     public function point() {
-        $this->runTick($this->onPoint());
+        $this->runTick('onPoint');
     }
 
     /**
@@ -187,7 +186,7 @@ class Timer
      *
      */
     public function weekly() {
-        $this->runTick($this->onWeek());
+        $this->runTick('onWeek');
     }
 
     /**
@@ -196,7 +195,7 @@ class Timer
      */
     public function weeklyAny() {
         $weekTime = 7 * 24 * 60 * 60;
-        $this->runTick($this->call(), $weekTime);
+        $this->runTick('call', $weekTime);
     }
 
     /**
@@ -213,7 +212,7 @@ class Timer
      *
      */
     public function monthly() {
-        $this->runTick($this->onMonth());
+        $this->runTick('onMonth');
     }
 
     /**
@@ -230,7 +229,7 @@ class Timer
      *
      */
     public function yearly() {
-        $this->runTick($this->onYear());
+        $this->runTick('onYear');
     }
 
     /**
@@ -280,21 +279,21 @@ class Timer
     /**
      * Run tick
      *
-     * @param $callback
+     * @param string $call Callback name
      * @param int $stopwatch
      */
-    public function runTick($callback, $stopwatch = 1) {
+    public function runTick(string $call, $stopwatch = 1) {
         if ($this->asyncTimer) {
 
-            \swoole_timer_tick($stopwatch * 1000, function() use($callback) {
-                $callback();
+            \swoole_timer_tick($stopwatch * 1000, function() use ($call) {
+                $this->{$call}();
             });
 
         } else {
 
             while (true) {
                 sleep($stopwatch);
-                $callback();
+                $this->{$call}();
             }
         }
     }
