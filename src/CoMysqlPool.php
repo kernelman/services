@@ -78,8 +78,18 @@ class CoMysqlPool
      * Recycle connect from chan
      *
      * @param $connect
+     * @return mixed
      */
     public function recycle($connect) {
-        $this->pool->push($connect);
+        return $this->pool->push($connect);
+    }
+
+    /**
+     * Get pool size.
+     *
+     * @return mixed
+     */
+    public function poolSize() {
+        return $this->pool->length();
     }
 }
