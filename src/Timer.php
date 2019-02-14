@@ -30,16 +30,15 @@ class Timer
     /**
      * Timer constructor.
      *
-     * Timer constructor.
-     * @param $after
      * @param $callClass
      * @param $callback
+     * @param null $after
      * @param int $times
      * @param int $min
      * @param int $sec
      * @throws NotFoundException
      */
-    public function __construct($after, $callClass, $callback, $times = 0, $min = 0, $sec = 0) {
+    public function __construct($callClass, $callback, $after = null, $times = 0, $min = 0, $sec = 0) {
         if (!extension_loaded('swoole')) {
             throw new NotFoundException('The swoole extension can not loaded.');
         }
