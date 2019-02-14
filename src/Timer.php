@@ -30,6 +30,8 @@ class Timer
     /**
      * Timer constructor.
      *
+     * Timer constructor.
+     * @param $after
      * @param $callClass
      * @param $callback
      * @param int $times
