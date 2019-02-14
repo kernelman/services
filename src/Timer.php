@@ -209,7 +209,7 @@ class Timer
      */
     public function weeklyAny() {
         $weekTime = 7 * 24 * 60 * 60;
-        $this->runTick('call', $weekTime);
+        $this->trigger(null, 'call', $weekTime);
     }
 
     /**
