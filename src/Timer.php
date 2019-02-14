@@ -241,7 +241,7 @@ class Timer
     private function isFirst($first) {
 
         if ($this->times == 0) {
-            return $first();
+            return $first;
         }
 
         return false;
@@ -255,7 +255,7 @@ class Timer
      */
     private function isLast($last) {
         if ($this->times != 0) {
-            return $last();
+            return $last;
         }
 
         return false;
