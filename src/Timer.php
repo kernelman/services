@@ -23,8 +23,9 @@ class Timer
     private $sec;
 
     public $callClass;
-    public $asyncTimer = true;
-    public $coRoutine  = true;
+    public $before      = null;
+    public $asyncTimer  = true;
+    public $coRoutine   = true;
 
     /**
      * Timer constructor.
@@ -92,6 +93,7 @@ class Timer
     /**
      * Scheduled every hour.
      *
+     * @return bool
      */
     private function onHourlies() {
         $now = TimeRelated::current();
@@ -109,8 +111,10 @@ class Timer
         }
 
         if (array_search($now, $hourly) !== false) {
-            $this->call();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -118,20 +122,23 @@ class Timer
      *
      */
     public function hourlies() {
-        $this->runTick('onHourlies');
+        $this->trigger('onHourlies', 'call');
     }
 
     /**
      * Scheduled any hour.
      *
+     * @return bool
      */
     private function onHourlyAny() {
         $now    = TimeRelated::current();
         $hourly = TimeRelated::hourlyAny($this->times, $this->min, $this->sec);
 
         if ($now == $hourly) {
-            $this->call();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -139,19 +146,22 @@ class Timer
      *
      */
     public function hourlyAny() {
-        $this->runTick('onHourlyAny');
+        $this->trigger('onHourlyAny', 'call');
     }
 
     /**
      * Scheduled any point.
      *
+     * @return bool
      */
     private function onPoint() {
         $now = TimeRelated::current();
 
         if ($this->times == $now) {
-            $this->call();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -159,7 +169,7 @@ class Timer
      *
      */
     public function point() {
-        $this->runTick('onPoint');
+        $this->trigger('onPoint', 'call');
     }
 
     /**
@@ -175,10 +185,11 @@ class Timer
     /**
      * Scheduled every week.
      *
+     * @return bool
      */
     private function onWeek() {
         $now = TimeRelated::current();
-        $this->getTick($now, TimeRelated::weekFirst(), TimeRelated::weekLast());
+        return $this->getTick($now, TimeRelated::weekFirst(), TimeRelated::weekLast());
     }
 
     /**
@@ -186,7 +197,7 @@ class Timer
      *
      */
     public function weekly() {
-        $this->runTick('onWeek');
+        $this->trigger('onWeek', 'call');
     }
 
     /**
@@ -201,10 +212,11 @@ class Timer
     /**
      * Scheduled every month.
      *
+     * @return bool
      */
     private function onMonth() {
         $now = TimeRelated::current();
-        $this->getTick($now, TimeRelated::monthFirst(), TimeRelated::monthLast());
+        return $this->getTick($now, TimeRelated::monthFirst(), TimeRelated::monthLast());
     }
 
     /**
@@ -212,16 +224,17 @@ class Timer
      *
      */
     public function monthly() {
-        $this->runTick('onMonth');
+        $this->trigger('onMonth', 'call');
     }
 
     /**
      * Scheduled every year.
      *
+     * @return bool
      */
     private function onYear() {
         $now = TimeRelated::current();
-        $this->getTick($now, TimeRelated::yearFirst(), TimeRelated::yearLast());
+        return $this->getTick($now, TimeRelated::yearFirst(), TimeRelated::yearLast());
     }
 
     /**
@@ -229,7 +242,7 @@ class Timer
      *
      */
     public function yearly() {
-        $this->runTick('onYear');
+        $this->trigger('onYear', 'call');
     }
 
     /**
@@ -267,13 +280,16 @@ class Timer
      * @param $now
      * @param $first
      * @param $last
+     * @return bool
      */
     private function getTick($now, $first, $last) {
         $tick = $this->isFirst($first) ?? $this->isLast($last);
 
         if ($now == $tick) {
-            $this->call();
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -282,7 +298,7 @@ class Timer
      * @param string $call Callback name
      * @param int $stopwatch
      */
-    public function runTick(string $call, $stopwatch = 1) {
+    private function runTick(string $call, $stopwatch) {
         if ($this->asyncTimer) {
 
             \swoole_timer_tick($stopwatch * 1000, function() use ($call) {
@@ -296,5 +312,52 @@ class Timer
                 $this->{$call}();
             }
         }
+    }
+
+    /**
+     * @param $callFirst
+     * @param $callLast
+     * @param int $stopwatch
+     */
+    private function trigger(string $callFirst, string $callLast = '', $stopwatch = 1) {
+
+        if ($this->asyncTimer) {
+
+            if ($this->before === null) {
+                \swoole_timer_tick($stopwatch * 1000, function() use ($callFirst, $callLast) {
+                    if ($callLast == '') {
+                        $this->{$callFirst}();
+
+                    } else {
+
+                        if($this->{$callFirst}()) {
+                            $this->{$callLast}();
+                        }
+                    }
+                });
+
+            }  else {
+                $this->triggerBefore($callFirst, $callLast, $stopwatch);
+            }
+
+        } else {
+
+            while (true) {
+                sleep($stopwatch);
+
+                if ($callLast == '') {
+                    $this->{$callFirst}();
+
+                } else {
+
+                    if($this->{$callFirst}()) {
+                        $this->{$callLast}();
+                    }
+                }
+            }
+        }
+    }
+
+    private function triggerBefore(string $callFirst, string $callLast = '', $stopwatch = 1) {
     }
 }
