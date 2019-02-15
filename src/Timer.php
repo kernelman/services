@@ -305,7 +305,7 @@ class Timer
             $this->timerTick(null, $call, $stopwatch);
 
         } else {
-            $this->timerTickSync(null, $callLast, $stopwatch);
+            $this->timerTickSync(null, $call, $stopwatch);
         }
     }
 

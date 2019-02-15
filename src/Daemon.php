@@ -31,9 +31,9 @@ class Daemon
 
     const   IS_DOWN         = 'The process is not running';
     const   IS_RUN          = 'The process is running';
-    const   IS_STOP         = 'The process has stoped';
-    const   IS_START        = 'The process has started';
-    const   IS_RELOAD       = 'The process has reloaded';
+    const   IS_STOP         = 'The process has stop success';
+    const   IS_START        = 'The process has started success';
+    const   IS_RELOAD       = 'The process has reloaded success';
     const   IS_FAILED       = 'the process failed';
 
     /**
