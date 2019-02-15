@@ -302,17 +302,10 @@ class Timer
      */
     private function runTick(string $call, $stopwatch) {
         if ($this->asyncTimer) {
-
-            \swoole_timer_tick($stopwatch * 1000, function() use ($call) {
-                $this->{$call}();
-            });
+            $this->timerTick(null, $call, $stopwatch);
 
         } else {
-
-            while (true) {
-                sleep($stopwatch);
-                $this->{$call}();
-            }
+            $this->timerTickSync(null, $callLast, $stopwatch);
         }
     }
 
@@ -326,38 +319,14 @@ class Timer
         if ($this->asyncTimer) {
 
             if ($this->after === null) {
-                \swoole_timer_tick($stopwatch * 1000, function() use ($callFirst, $callLast) {
-
-                    if ($callFirst == null) {
-                        $this->{$callLast}();
-
-                    } else {
-
-                        if($this->{$callFirst}()) {
-                            $this->{$callLast}();
-                        }
-                    }
-                });
+                $this->timerTick($callFirst, $callLast, $stopwatch);
 
             }  else {
                 $this->triggerAfter($callFirst, $callLast, $stopwatch);
             }
 
         } else {
-
-            while (true) {
-                sleep($stopwatch);
-
-                if ($callFirst == null) {
-                    $this->{$callLast}();
-
-                } else {
-
-                    if($this->{$callFirst}()) {
-                        $this->{$callLast}();
-                    }
-                }
-            }
+            $this->timerTickSync($callFirst, $callLast, $stopwatch);
         }
     }
 
@@ -367,28 +336,63 @@ class Timer
      * @param int $stopwatch
      */
     private function triggerAfter(string $callFirst = null, string $callLast, $stopwatch = 1) {
-        if ($callFirst == null) {
+        $this->afterTick($callLast);
+        $this->timerTick($callFirst, $callLast, $stopwatch);
+    }
 
-            \swoole_timer_after($this->after * 1000, function() use ($callLast) {
-                $this->{$callLast}();
-            });
+    /**
+     * @param string $callback
+     */
+    private function afterTick(string $callback) {
+        \swoole_timer_after($this->after * 1000, function() use ($callback) {
+            $this->{$callback}();
+        });
+    }
+
+    /**
+     * @param string|null $callFirst
+     * @param string $callLast
+     * @param int $stopwatch
+     */
+    private function timerTick(string $callFirst = null, string $callLast, $stopwatch = 1) {
+        if ($callFirst == null) {
 
             \swoole_timer_tick($stopwatch * 1000, function() use ($callLast) {
                 $this->{$callLast}();
             });
 
         } else {
-
-            \swoole_timer_after($this->after * 1000, function() use ($callLast) {
-                $this->{$callLast}();
-            });
-
             \swoole_timer_tick($stopwatch * 1000, function() use ($callFirst, $callLast) {
 
                 if($this->{$callFirst}()) {
                     $this->{$callLast}();
                 }
             });
+        }
+    }
+
+    /**
+     * @param string|null $callFirst
+     * @param string $callLast
+     * @param int $stopwatch
+     */
+    private function timerTickSync(string $callFirst = null, string $callLast, $stopwatch = 1) {
+
+        if ($callFirst == null) {
+
+            while (true) {
+                sleep($stopwatch);
+                $this->{$callLast}();
+            }
+
+        } else {
+
+            while (true) {
+                sleep($stopwatch);
+                if($this->{$callFirst}()) {
+                    $this->{$callLast}();
+                }
+            }
         }
     }
 }
