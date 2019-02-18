@@ -14,7 +14,7 @@ namespace Services;
 use Common\Strings;
 use Exceptions\InvalidArgumentException;
 use Exceptions\NotFoundException;
-use Store\File\Sync\FileStore;
+use Files\Sync\FileStore;
 
 class Daemon
 {
